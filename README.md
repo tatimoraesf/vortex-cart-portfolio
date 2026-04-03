@@ -1,25 +1,24 @@
-🛒 Vortex Cart API (Estudo de Automação)
-Este é um projeto de estudo desenvolvido para praticar Testes de Integração e Lógica de Back-end. A API simula um carrinho de compras com controle de estoque persistente em banco de dados.
+# 🛒 Vortex Cart API (Estudo de Automação)
 
-🚀 O que o projeto faz?
-O sistema gerencia produtos e um carrinho de compras seguindo estas regras:
+Este é um projeto de estudo desenvolvido para praticar **Testes de Integração** e **Lógica de Back-end**. A API simula um carrinho de compras com controle de estoque persistente em banco de dados.
 
-Adicionar ao Carrinho: O sistema verifica se o produto existe e se há estoque disponível antes de adicionar.
+## 🚀 O que o projeto faz?
 
-Controle de Inventário: Ao adicionar um item, o estoque do produto diminui. Ao remover, o estoque é devolvido automaticamente.
+O sistema gerencia produtos e um carrinho de compras seguindo estas regras de negócio:
 
-Persistência: Os dados não somem ao reiniciar o servidor, pois são salvos em um banco de dados SQLite.
+* **Adicionar ao Carrinho:** O sistema verifica se o produto existe e se há estoque disponível antes de permitir a adição.
+* **Controle de Inventário:** Ao adicionar um item, o estoque do produto diminui automaticamente. Ao remover o item do carrinho, o estoque é devolvido ao catálogo.
+* **Persistência de Dados:** Os dados são salvos em um banco de dados SQLite, garantindo que as informações não sejam perdidas ao reiniciar o servidor.
 
-🛠️ Tecnologias Utilizadas
-Node.js com Fastify (Framework para as rotas da API).
+## 🛠️ Tecnologias Utilizadas
 
-SQLite (Banco de Dados).
+* **Node.js**: Ambiente de execução.
+* **Fastify**: Framework moderno e rápido para as rotas da API.
+* **SQLite**: Banco de Dados relacional para persistência simples.
+* **Jest & Supertest**: Ferramentas utilizadas para a criação e execução dos testes automatizados de integração.
 
-Jest e Supertest (Ferramentas para os testes automatizados).
+## 🧪 Como rodar o projeto
 
-🧪 Como rodar os testes
-Para garantir que todas as regras de negócio estão funcionando, execute:
-
-Bash
+1. Instale as dependências:
+```bash
 npm install
-npx jest
