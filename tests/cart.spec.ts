@@ -1,0 +1,93 @@
+import supertest from 'supertest';
+import { buildServer } from '../src/server';
+
+describe('API de Carrinho (Vortex Cart)', () => {
+  let app: any;
+
+  beforeAll(async () => {
+    app = await buildServer();
+    await app.ready();
+  });
+
+  beforeEach(async () => {
+    const db = (app as any).db;
+
+    await db.run('DELETE FROM cart');
+    await db.run('UPDATE products SET inventory = 5 WHERE id = "1"');
+    await db.run('UPDATE products SET inventory = 0 WHERE id = "2"');
+  });
+
+  afterAll(async () => {
+    if (app) {
+      await app.close();
+    }
+  });
+
+  test('Deve retornar 404 ao tentar adicionar um produto inexistente', async () => {
+    const response = await supertest(app.server)
+      .post('/cart')
+      .send({
+        product_id: "999",
+        quantity: 1
+      });
+
+    expect(response.status).toBe(404);
+    expect(response.body.error).toBe('Produto não existe no catálogo');
+  })
+
+  test('Deve retornar 422 ao tentar adicionar um produto com quantidade insuficiente', async () => {
+    const response = await supertest(app.server)
+      .post('/cart')
+      .send({
+        product_id: "1",
+        quantity: 10
+      });
+
+    expect(response.status).toBe(422);
+    expect(response.body.error).toBe('Estoque insuficiente');
+  });
+  test('Deve retornar 400 para quantidade negativa', async () => {
+    const response = await supertest(app.server)
+      .post('/cart')
+      .send({
+        product_id: "1",
+        quantity: -5
+      })
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe('Quantidade inválida');
+  });
+  test('Deve listar no GET o produto adicionado via POST', async () => {
+    const postRes = await supertest(app.server)
+      .post('/cart')
+      .send({ product_id: "1", quantity: 1 });
+
+    expect(postRes.status).toBe(200);
+
+    const response = await supertest(app.server).get('/cart');
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(1);
+    expect(response.body[0].product_id).toBe("1");
+  });
+
+  test('Deve remover o produto do carrinho com sucesso', async () => {
+    await supertest(app.server)
+      .post('/cart')
+      .send({ product_id: "1", quantity: 1 });
+
+    const carrinho = await supertest(app.server).get('/cart');
+    const idNoCarrinho = carrinho.body[0].id;
+
+    const response = await supertest(app.server).delete(`/cart/${idNoCarrinho}`);
+    expect(response.status).toBe(204);
+
+    const db = (app as any).db;
+    const checkInventory = await db.get('SELECT inventory FROM products WHERE id = "1"');
+    expect(checkInventory.inventory).toBe(5);
+
+
+    const checkCart = await supertest(app.server).get('/cart');
+    expect(checkCart.body.length).toBe(0);
+  });
+})
