@@ -1,0 +1,15 @@
+name: Smoke Test Trigger
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  ping-n8n:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger n8n Workflow
+        run: |
+          curl -X POST http://localhost:5678/webhook/vortex-smoke-test \
+          -H "Content-Type: application/json" \
+          -d '{"ref": "${{ github.ref }}", "repo": "${{ github.repository }}"}'

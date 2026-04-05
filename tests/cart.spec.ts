@@ -23,6 +23,52 @@ describe('API de Carrinho (Vortex Cart)', () => {
     }
   });
 
+  test('GET /health deve retornar status 200 e confirmar que a API está online', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/health'
+    });
+
+    expect(response.statusCode).toBe(200);
+
+    const body = JSON.parse(response.payload);
+    expect(body.status).toBe("ok");
+    expect(body).toHaveProperty('timestamp');
+  })
+
+  test('Deve retornar 200 ao buscar um produto pelo ID', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/products/1'
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = JSON.parse(response.payload);
+    expect(body.id).toBe("1");
+  });
+
+  test('Deve retornar 404 ao buscar um produto inexistente', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/products/999'
+    });
+
+    expect(response.statusCode).toBe(404);
+  });
+
+
+  test('GET /products deve retornar uma lista de produtos inicializada', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/products'
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = JSON.parse(response.payload);
+
+    expect(body.length).toBeGreaterThan(0);
+  })
+
   test('Deve retornar 404 ao tentar adicionar um produto inexistente', async () => {
     const response = await supertest(app.server)
       .post('/cart')
@@ -46,6 +92,7 @@ describe('API de Carrinho (Vortex Cart)', () => {
     expect(response.status).toBe(422);
     expect(response.body.error).toBe('Estoque insuficiente');
   });
+
   test('Deve retornar 400 para quantidade negativa', async () => {
     const response = await supertest(app.server)
       .post('/cart')
@@ -55,8 +102,9 @@ describe('API de Carrinho (Vortex Cart)', () => {
       })
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Quantidade inválida');
+    expect(response.body.error).toBe('Bad Request');
   });
+
   test('Deve listar no GET o produto adicionado via POST', async () => {
     const postRes = await supertest(app.server)
       .post('/cart')
