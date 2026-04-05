@@ -8,12 +8,20 @@ export async function buildServer() {
 
   (server as any).db = db;
 
+  server.get('/health', async (request, reply) => {
+    return {
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      service: "vortex-cart"
+    }
+  })
+
   // ROTA: Adicionar ao Carrinho
   server.post('/cart', {
     schema: {
       body: S.object()
         .prop('product_id', S.string().required())
-        .prop('quantity', S.number().required())
+        .prop('quantity', S.integer().minimum(1).required())
     }
   }, async (request, reply) => {
     const { product_id, quantity } = request.body as any;
@@ -35,6 +43,20 @@ export async function buildServer() {
 
     return { message: 'Adicionado com sucesso!', item: produto.name };
   });
+
+  server.get('/products', async (request, reply) => {
+    const products = await (server as any).db.all('SELECT * FROM products');
+    return products;
+  })
+
+  server.get('/products/:id', async (request, reply) => {
+    const { id } = request.params as any;
+    const product = await db.get('SELECT * FROM products WHERE id = ?', id);
+
+    if (!product) return reply.status(404).send({ error: 'Produto nao encontrado' });
+
+    return product;
+  })
 
   server.get('/cart', async () => {
     const sql = `
@@ -66,6 +88,22 @@ export async function buildServer() {
     return reply.status(204).send();
 
   });
+
+  // ROTA DE ADMIN: Resetar Banco (Para uso do n8n e Testes)
+  server.post('/admin/reset-db', async (request, reply) => {
+    const db = (server as any).db;
+
+    // Limpa as tabelas
+    await db.run('DELETE FROM cart');
+    await db.run('DELETE FROM products');
+
+    // Repopula com dados iniciais para o Smoke Test do n8n sempre passar
+    await db.run('INSERT INTO products (id, name, price, inventory) VALUES ("1", "Teclado Mecânico", 150.00, 10)');
+    await db.run('INSERT INTO products (id, name, price, inventory) VALUES ("2", "Mouse Gamer", 80.00, 5)');
+
+    return { message: "Banco de dados resetado com sucesso!" };
+  });
+
   return server;
 }
 
