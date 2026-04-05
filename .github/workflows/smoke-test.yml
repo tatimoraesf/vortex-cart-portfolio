@@ -10,6 +10,6 @@ jobs:
     steps:
       - name: Trigger n8n Workflow
         run: |
-          curl -X POST http://localhost:5678/webhook/vortex-smoke-test \
+          curl -X POST https://nevada-burdened-lynn.ngrok-free.dev/webhook/vortex-smoke-test \
           -H "Content-Type: application/json" \
           -d '{"ref": "${{ github.ref }}", "repo": "${{ github.repository }}"}'
