@@ -25,8 +25,8 @@ npm install```
 
 2. Para rodar os testes e validar as regras de negócio:
 ```bash
-npx jest```
+npx jest
 
 3. Para rodar o servidor em modo de desenvolvimento:
 ```bash
-npm run dev```
+npm run dev
