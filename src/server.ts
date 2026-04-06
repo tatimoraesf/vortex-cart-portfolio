@@ -1,10 +1,14 @@
 import Fastify from 'fastify';
 import S from 'fluent-json-schema';
 import { setupDatabase } from './database';
+import { ProductService } from './services/ProductService';
+import { CartService } from './services/CartService';
 
 export async function buildServer() {
   const server = Fastify({ logger: false });
   const db = await setupDatabase();
+  const productService = new ProductService(db);
+  const cartService = new CartService(db);
 
   (server as any).db = db;
 
@@ -14,6 +18,19 @@ export async function buildServer() {
       timestamp: new Date().toISOString(),
       service: "vortex-cart"
     }
+  })
+
+  server.get('/products', async () => {
+    return productService.listAll();
+  })
+
+  server.get('/products/:id', async (request, reply) => {
+    const { id } = request.params as any;
+    const product = await db.get('SELECT * FROM products WHERE id = ?', id);
+
+    if (!product) return reply.status(404).send({ error: 'Produto nao encontrado' });
+
+    return product;
   })
 
   // ROTA: Adicionar ao Carrinho
@@ -26,66 +43,32 @@ export async function buildServer() {
   }, async (request, reply) => {
     const { product_id, quantity } = request.body as any;
 
-    if (quantity <= 0) return reply.status(400).send({ error: 'Quantidade inválida' });
-
-    const produto = await db.get('SELECT * FROM products WHERE  id = ?', product_id);
-
-    if (!produto) return reply.status(404).send({ error: 'Produto não existe no catálogo' });
-
-    if (produto.inventory < quantity) return reply.status(422).send({ error: 'Estoque insuficiente' });
-
-    await db.run('INSERT INTO cart (product_id, name, quantity) VALUES (?, ?, ?)',
-      product_id, produto.name, quantity
-    );
-
-    await db.run('UPDATE products SET inventory = inventory - ? WHERE id = ? AND inventory >= ?',
-      quantity, product_id, quantity);
-
-    return { message: 'Adicionado com sucesso!', item: produto.name };
+    try {
+      const result = await cartService.addToCart(product_id, quantity);
+      return { message: 'Adicionado com sucesso!', item: result.itemName };
+    } catch (error: any) {
+      if (error.message === 'PRODUCT_NOT_FOUND') return reply.status(404).send({ error: 'Produto não existe no catálogo' });
+      if (error.message === 'INSUFFICIENT_STOCK') return reply.status(422).send({ error: 'Estoque insuficiente' });
+      throw error;
+    }
   });
 
-  server.get('/products', async (request, reply) => {
-    const products = await (server as any).db.all('SELECT * FROM products');
-    return products;
-  })
-
-  server.get('/products/:id', async (request, reply) => {
-    const { id } = request.params as any;
-    const product = await db.get('SELECT * FROM products WHERE id = ?', id);
-
-    if (!product) return reply.status(404).send({ error: 'Produto nao encontrado' });
-
-    return product;
-  })
-
   server.get('/cart', async () => {
-    const sql = `
-    SELECT 
-      cart.id, 
-      cart.product_id, 
-      cart.name, 
-      cart.quantity, 
-      products.price 
-    FROM cart 
-    JOIN products ON cart.product_id = products.id
-  `;
-    return await db.all(sql);
+    return cartService.listItems();
   });
 
   server.delete('/cart/:id', async (request, reply) => {
     const { id } = request.params as any;
 
-    const itemNoCarrinho = await db.get('SELECT * FROM cart WHERE id = ?', id);
-
-    if (!itemNoCarrinho) {
-      return reply.status(404).send({ error: 'Item nao encontrado no carrinho' });
+    try {
+      await cartService.removeFromCart(id);
+      return reply.status(204).send();
+    } catch (error: any) {
+      if (error.message === 'ITEM_NOT_FOUND') {
+        return reply.status(404).send({ error: 'Item nao encontrado no carrinho' });
+      }
+      throw error;
     }
-
-    await db.run('UPDATE products SET inventory = inventory + ? WHERE id = ?', itemNoCarrinho.quantity, itemNoCarrinho.product_id);
-
-    await db.run('DELETE FROM cart WHERE id = ?', id);
-
-    return reply.status(204).send();
 
   });
 
