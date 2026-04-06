@@ -20,13 +20,10 @@ O sistema gerencia produtos e um carrinho de compras seguindo estas regras de ne
 ## 🧪 Como rodar o projeto
 
 1. Instale as dependências:
-```bash
-npm install```
+npm install
 
 2. Para rodar os testes e validar as regras de negócio:
-```bash
 npx jest
 
 3. Para rodar o servidor em modo de desenvolvimento:
-```bash
 npm run dev
