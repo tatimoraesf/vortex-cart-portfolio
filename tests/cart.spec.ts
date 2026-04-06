@@ -138,4 +138,31 @@ describe('API de Carrinho (Vortex Cart)', () => {
     const checkCart = await supertest(app.server).get('/cart');
     expect(checkCart.body.length).toBe(0);
   });
+
+  test('RACE CONDITION: Não deve permitir vender mais do que o estoque em pedidos simultâneos', async () => {
+    const db = (app as any).db;
+    await db.run('UPDATE products SET inventory = 1 WHERE id = "1"');
+
+    const [res1, res2] = await Promise.all([
+      app.inject({
+        method: 'POST',
+        url: '/cart',
+        payload: { product_id: "1", quantity: 1 }
+      }),
+      app.inject({
+        method: 'POST',
+        url: '/cart',
+        payload: { product_id: "1", quantity: 1 }
+      })
+    ]);
+
+    const statuses = [res1.statusCode, res2.statusCode];
+
+    expect(statuses).toContain(200);
+    expect(statuses).toContain(422);
+
+    const product = await db.get('SELECT inventory FROM products WHERE id = "2"');
+    expect(product.inventory).toBe(0);
+
+  })
 })

@@ -5,24 +5,29 @@ export class CartService {
 
   async addToCart(productId: string, quantity: number) {
     const product = await this.db.get('SELECT * FROM products WHERE id = ?', productId);
+    if (!product) throw new Error('PRODUCT_NOT_FOUND');
 
-    if (!product) {
-      throw new Error('PRODUCT_NOT_FOUND');
+    try {
+      const result = await this.db.run(
+        'UPDATE products SET inventory = inventory - ? WHERE id = ? AND inventory >= ?',
+        quantity, productId, quantity
+      );
+
+      if (!result || result.changes === 0) {
+        throw new Error('INSUFFICIENT_STOCK');
+      }
+
+      await this.db.run(
+        'INSERT INTO cart (product_id, name, quantity) VALUES (?, ?, ?)',
+        productId, product.name, quantity
+      )
+      return { itemName: product.name };
+    } catch (error: any) {
+      if (error.message === 'INSUFFICIENT_STOCK') throw error;
+
+      console.error("Erro intenro no banco:", error.message);
+      throw new Error('INTERNAL_ERROR');
     }
-    if (product.inventory < quantity) {
-      throw new Error('INSUFFICIENT_STOCK');
-    }
-
-    await this.db.run(
-      'INSERT INTO cart (product_id, name, quantity) VALUES (?, ?, ?)',
-      productId, product.name, quantity
-    );
-
-    await this.db.run(
-      'UPDATE products SET inventory = inventory - ? WHERE id = ?',
-      quantity, productId
-    );
-    return { itemName: product.name };
   }
 
   async removeFromCart(cartItemId: string) {
