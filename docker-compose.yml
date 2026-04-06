@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # O seu n8n que já existia (mantive os volumes para você não perder dados)
   n8n:
     image: n8nio/n8n:latest
     ports:
@@ -7,5 +10,35 @@ services:
       - n8n_data:/home/node/.n8n
     environment:
       - N8N_HOST=localhost
+    networks:
+      - vortex-net
+
+  # A API
+  vortex-api:
+    build: . 
+    ports:
+      - "3000:3000"
+    networks:
+      - vortex-net
+
+  # O NGROK 
+  ngrok:
+    image: ngrok/ngrok:latest
+    command:
+      - "http"
+      - "n8n:5678"
+    environment:
+      - NGROK_AUTHTOKEN=3BxZzf7f71VMBzp8fZDXtoxz4Le_22zUgLWsK5MFYSaEcqriw
+    ports:
+      - "4040:4040"
+    depends_on:
+      - vortex-api
+    networks:
+      - vortex-net
+
 volumes:
   n8n_data:
+
+networks:
+  vortex-net:
+    driver: bridge
