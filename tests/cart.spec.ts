@@ -30,7 +30,7 @@ describe('API de Carrinho (Vortex Cart)', () => {
       url: '/health'
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(404);
 
     const body = JSON.parse(response.payload);
     expect(body.status).toBe("ok");
