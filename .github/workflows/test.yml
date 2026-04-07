@@ -1,8 +1,8 @@
-name: CI Vortex Cart
+name: CI Vortex Cart - Jest & Monitoring
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
 
@@ -23,6 +23,7 @@ jobs:
         run: npm install
 
       - name: Run Tests and Generate Reports
+        id: run_tests
         run: npm run test:ci
 
       - name: Upload Test Reports (Artifacts)
