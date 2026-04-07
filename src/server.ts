@@ -25,13 +25,15 @@ export async function buildServer() {
 }
 
 if (require.main === module) {
-  buildServer().then(app => {
-    app.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-      console.log(`Server listening at ${address}`)
-    });
-  });
+  const start = async () => {
+    try {
+      const app = await buildServer();
+      await app.listen({ port: 3000, host: '0.0.0.0' });
+      console.log('🚀 Servidor rodando em http://0.0.0.0:3000');
+    } catch (err) {
+      console.error('❌ Erro ao subir o servidor:', err)
+      process.exit(1);
+    }
+  }
+  start();
 }
