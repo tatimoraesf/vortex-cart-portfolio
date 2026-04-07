@@ -1,15 +1,6 @@
 import { FastifyInstance } from "fastify";
 
 export async function adminRoutes(server: FastifyInstance) {
-
-  server.get('/health', async () => {
-    return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      service: "vortex-cart"
-    };
-  });
-
   server.post('/admin/reset-db', async (request, reply) => {
     const db = (server as any).db;
 

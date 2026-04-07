@@ -16,6 +16,13 @@ export async function buildServer() {
   const productService = new ProductService(db);
   const cartService = new CartService(db);
 
+  server.get('/health', async () => {
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      service: "vortex-cart"
+    };
+  });
 
   server.register(adminRoutes);
   server.register(cartRoutes, { cartService });
