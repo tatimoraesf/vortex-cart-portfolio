@@ -1,5 +1,6 @@
 import supertest from 'supertest';
 import { buildServer } from '../src/server';
+import { describe, expect, test, beforeAll, beforeEach, afterAll } from '@jest/globals';
 
 describe('API de Carrinho (Vortex Cart)', () => {
   let app: any;
