@@ -1,4 +1,4 @@
-# 🛒 Vortex Cart API
+# 🛒 Vortex Cart API (Estudo de Automação)
 
 Este é um projeto de estudo desenvolvido para praticar **Testes de Integração** e **Lógica de Back-end**. A API simula um carrinho de compras com controle de estoque persistente em banco de dados.
 
