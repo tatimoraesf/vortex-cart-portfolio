@@ -41,6 +41,7 @@ jobs:
         env:
           DATABASE_URL: postgres://user_vortex:password_vortex@localhost:5432/vortex_cart
           NODE_ENV: test
+          JEST_HTML_REPORTER_OUTPUT_PATH: reports/test-report.html
 
       - name: Upload Test Metrics Artifact
         if: always()
@@ -52,11 +53,14 @@ jobs:
       - name: Notify n8n (Webhook)
         if: always()
         run: |
+          METRICS_CONTENT=$(cat reports/metrics.json)
+
           curl -X POST "${{ secrets.N8N_WEBHOOK_URL }}" \
           -H "Content-Type: application/json" \
-          -d '{
-            "status": "${{ job.status }}",
-            "repository": "${{ github.repository }}",
-            "commit": "${{ github.sha }}",
-            "report_path": "reports/metrics.json"
-          }'
+          -d "{
+            \"status\": \"${{ job.status }}\",
+            \"repository\": \"${{ github.repository }}\",
+            \"commit\": \"${{ github.sha }}\",
+            \"runId\": \"${{ github.run_id }}\",
+            \"metrics\": $METRICS_CONTENT
+          }"
