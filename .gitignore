@@ -7,3 +7,4 @@ dist/
 reports/
 *.html
 metrics.json
+.env.test

@@ -7,7 +7,7 @@
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "jest",
+    "test": "dotenv -e .env.test -- jest",
     "test:ci": "jest --ci --json --outputFile=reports/metrics.json --reporters=default --reporters=jest-html-reporter"
   },
   "keywords": [],
@@ -19,6 +19,7 @@
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",
+    "dotenv-cli": "^11.0.0",
     "jest": "^30.3.0",
     "jest-html-reporter": "^4.4.0",
     "supertest": "^7.2.2",
