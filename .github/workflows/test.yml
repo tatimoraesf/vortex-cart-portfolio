@@ -1,8 +1,8 @@
-name: CI Vortex Cart - Jest & Monitoring
+name: CI Vortex Cart
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -10,33 +10,34 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: user_vortex
+          POSTGRES_PASSWORD: password_vortex
+          POSTGRES_DB: vortex_cart
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run Tests and Generate Reports
-        id: run_tests
-        run: npm run test:ci
-
-      - name: Upload Test Reports (Artifacts)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: vortex-test-reports
-          path: reports/
-          retention-days: 5
-
-      - name: Notify n8n Webhook
-        if: always()
-        run: |
-          curl -X POST "${{ secrets.N8N_WEBHOOK_URL }}" \
-          -H "Content-Type: application/json" \
-          -d '{"status": "${{ job.status }}", "project": "vortex-cart", "runId": "${{ github.run_id }}"}'
+      - name: Run Tests
+        run: npm test
+        env:
+          DATABASE_URL: postgres://user_vortex:password_vortex@localhost:5432/vortex_cart
+          NODE_ENV: test
