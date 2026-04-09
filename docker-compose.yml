@@ -16,6 +16,11 @@ services:
     build: . 
     ports:
       - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NODE_ENV=${NODE_ENV}
+    depends_on:
+      - db
     networks:
       - vortex-net
 
@@ -25,11 +30,11 @@ services:
       - "http"
       - "n8n:5678"
     environment:
-      - NGROK_AUTHTOKEN=3BxZzf7f71VMBzp8fZDXtoxz4Le_22zUgLWsK5MFYSaEcqriw
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     ports:
       - "4040:4040"
     depends_on:
-      - vortex-api
+      - n8n
     networks:
       - vortex-net
 
@@ -45,7 +50,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    networks: 
+      - vortex-net
 
 volumes:
   postgres_data:
