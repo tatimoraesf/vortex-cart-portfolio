@@ -29,9 +29,17 @@ export async function cartRoutes(server: FastifyInstance, options: any) {
   });
 
   server.delete('/cart/:id', async (request, reply) => {
-    const { id } = request.params as any;
+    const params = request.params as { id: string };
+    const idParam = params.id;
+
     try {
-      await cartService.removeFromCart(id);
+      const idParaRemover = parseInt(idParam, 10);
+
+      if (isNaN(idParaRemover)) {
+        return reply.status(400).send(({ error: 'ID inválido' }))
+      }
+
+      await cartService.removeFromCart(idParaRemover);
       return reply.status(204).send();
     } catch (error: any) {
       return reply.status(404).send({ error: 'Item nao encontrado no carrinho' });

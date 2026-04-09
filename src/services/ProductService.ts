@@ -1,17 +1,20 @@
-import { Database } from 'sqlite';
+import { Pool } from "pg";
 
 export class ProductService {
-  constructor(private db: Database) { }
+  constructor(private pool: Pool) { }
+
 
   async listAll() {
-    return await this.db.all('SELECT * FROM products');
+    const res = await this.pool.query('SELECT * FROM products');
+    return res.rows;
   }
 
   async findById(id: string) {
-    const product = await this.db.get('SELECT * FROM products WHERE id = ?', id);
+    const res = await this.pool.query('SELECT * FROM products WHERE id = $1', [id])
+    const product = res.rows[0];
 
     if (!product) {
-      throw new Error('PRODUCT_NOT_FOUND');
+      return null
     }
 
     return product;

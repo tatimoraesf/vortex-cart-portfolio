@@ -1,50 +1,78 @@
-import { Database } from 'sqlite';
+import { Pool } from 'pg';
 
 export class CartService {
-  constructor(private db: Database) { }
+  constructor(private pool: Pool) { }
 
   async addToCart(productId: string, quantity: number) {
-    const product = await this.db.get('SELECT * FROM products WHERE id = ?', productId);
-    if (!product) throw new Error('PRODUCT_NOT_FOUND');
+    const client = await this.pool.connect();
 
     try {
-      const result = await this.db.run(
-        'UPDATE products SET inventory = inventory - ? WHERE id = ? AND inventory >= ?',
-        quantity, productId, quantity
+      await client.query('BEGIN');
+
+      const productRes = await client.query('SELECT * FROM products WHERE id = $1', [productId]);
+      const product = productRes.rows[0];
+
+      if (!product) throw new Error('PRODUCT_NOT_FOUND');
+
+      const updateRes = await client.query(
+        'UPDATE products SET inventory = inventory - $1 WHERE id = $2 AND inventory >= $1',
+        [quantity, productId]
       );
 
-      if (!result || result.changes === 0) {
+      if (updateRes.rowCount === 0) {
         throw new Error('INSUFFICIENT_STOCK');
       }
 
-      await this.db.run(
-        'INSERT INTO cart (product_id, name, quantity) VALUES (?, ?, ?)',
-        productId, product.name, quantity
+      await client.query(
+        'INSERT INTO cart (product_id, name, quantity) VALUES ($1, $2, $3)',
+        [productId, product.name, quantity]
       )
-      return { itemName: product.name };
-    } catch (error: any) {
-      if (error.message === 'INSUFFICIENT_STOCK') throw error;
 
-      console.error("Erro intenro no banco:", error.message);
+      await client.query('COMMIT');
+
+      return { itemName: product.name };
+
+    } catch (error: any) {
+      await client.query('ROLLBACK');
+
+      if (error.message === 'INSUFFICIENT_STOCK' || error.message === 'PRODUCT_NOT_FOUND') {
+        throw error;
+      }
+
+      console.error("Erro intenro no Postgress:", error.message);
       throw new Error('INTERNAL_ERROR');
+    } finally {
+      client.release();
     }
   }
 
-  async removeFromCart(cartItemId: string) {
-    const item = await this.db.get('SELECT * FROM cart WHERE id = ?', cartItemId);
+  async removeFromCart(cartItemId: number) {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    if (!item) {
-      throw new Error('ITEM_NOT_FOUND');
+      const itemRes = await client.query('SELECT * FROM cart WHERE id = $1', [cartItemId]);
+      const item = itemRes.rows[0];
+
+      if (!item) throw new Error('ITEM_NOT_FOUND');
+
+      await client.query(
+        'UPDATE products SET inventory = inventory + $1 WHERE id = $2',
+        [item.quantity, item.product_id]
+      );
+
+      await client.query('DELETE FROM cart WHERE id = $1', [cartItemId]);
+
+      await client.query('COMMIT');
+
+      return { message: 'Item removido com sucesso!' };
+    } catch (error: any) {
+      await client.query('ROLLBACK');
+
+      throw error;
+    } finally {
+      client.release();
     }
-
-    await this.db.run(
-      'UPDATE products SET inventory = inventory + ? WHERE id = ?',
-      item.quantity, item.product_id
-    );
-
-    await this.db.run('DELETE FROM cart WHERE id = ?', cartItemId);
-
-    return { message: 'Item removido com sucesso!' };
   }
 
   async listItems() {
@@ -54,7 +82,8 @@ export class CartService {
     JOIN products ON cart.product_id = products.id    
     `;
 
+    const res = await this.pool.query(sql);
 
-    return await this.db.all(sql);
+    return res.rows;
   }
 }

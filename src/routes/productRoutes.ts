@@ -9,11 +9,14 @@ export async function productRoutes(server: FastifyInstance, options: any) {
   });
 
   server.get('/products/:id', async (request, reply) => {
-    const { id } = request.params as any;
-    try {
-      return await productService.findById(id);
-    } catch (error: any) {
+    const { id } = request.params as { id: string };
+
+    const product = await productService.findById(id);
+
+    if (!product) {
       return reply.status(404).send({ error: 'Produto nao encontrado' });
     }
+
+    return product;
   });
 };

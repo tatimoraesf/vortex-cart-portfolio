@@ -1,37 +1,36 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { Pool } from 'pg';
+
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 export async function setupDatabase() {
-  const db = await open({
-    filename: './database.db',
-    driver: sqlite3.Database
-  });
+  const client = await pool.connect();
 
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS products (
-      id TEXT PRIMARY KEY,
-      name TEXT,
-      inventory INTEGER,
-      price REAL
-    );
-  `);
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        inventory INTEGER NOT NULL DEFAULT 0,
+        price DECIMAL(10,2) NOT NULL
+      );
+    `);
 
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS cart (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      product_id TEXT,
-      name TEXT,
-      quantity INTEGER,
-      FOREIGN KEY(product_id) REFERENCES products(id)
-    );
-  `);
-
-  const products = await db.all('SELECT * FROM products');
-  if (products.length === 0) {
-    // Agora passamos 4 pontos de interrogação porque temos 4 colunas (id, name, inventory, price)
-    await db.run('INSERT INTO products (id, name, inventory, price) VALUES (?, ?, ?, ?)', '1', 'Teclado Mecânico', 5, 99.99);
-    await db.run('INSERT INTO products (id, name, inventory, price) VALUES (?, ?, ?, ?)', '2', 'Mouse Gamer', 0, 49.99);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS cart (
+        id SERIAL PRIMARY KEY,
+        product_id TEXT REFERENCES products(id),
+        name TEXT NOT NULL,
+        quantity INTEGER NOT NULL
+      );
+    `);
+    const res = await client.query('SELECT * FROM products LIMIT 1');
+    if (res.rowCount === 0) {
+      await client.query('INSERT INTO products (id, name, inventory, price) VALUES ($1, $2, $3, $4)', ['1', 'Teclado Mecânico', 5, 99.99]);
+      await client.query('INSERT INTO products (id, name, inventory, price) VALUES ($1, $2, $3, $4)', ['2', 'Mouse Gamer', 0, 49.99]);
+    }
+  } finally {
+    client.release();
   }
-
-  return db;
 }

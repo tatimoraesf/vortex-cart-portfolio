@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # O seu n8n que já existia (mantive os volumes para você não perder dados)
   n8n:
     image: n8nio/n8n:latest
     ports:
@@ -13,7 +12,6 @@ services:
     networks:
       - vortex-net
 
-  # A API
   vortex-api:
     build: . 
     ports:
@@ -21,7 +19,6 @@ services:
     networks:
       - vortex-net
 
-  # O NGROK 
   ngrok:
     image: ngrok/ngrok:latest
     command:
@@ -36,7 +33,22 @@ services:
     networks:
       - vortex-net
 
+  db:
+    image: postgres:15-alpine
+    container_name: vortex-db
+    restart: always
+    environment:
+      POSTGRES_USER: user_vortex
+      POSTGRES_PASSWORD: password_vortex
+      POSTGRES_DB: vortex_cart
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
 volumes:
+  postgres_data:
   n8n_data:
 
 networks:
