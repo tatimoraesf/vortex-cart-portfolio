@@ -42,6 +42,7 @@ jobs:
           DATABASE_URL: postgres://user_vortex:password_vortex@localhost:5432/vortex_cart
           NODE_ENV: test
           JEST_HTML_REPORTER_OUTPUT_PATH: reports/test-report.html
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
 
       - name: Upload Test Metrics Artifact
         if: always()
