@@ -53,7 +53,7 @@ describe('Validar endpoint /cart', () => {
     })
 
     const corpo = JSON.parse(response.payload)
-    expect(corpo.message).toBe('body/quantity must be >= 1')
+    expect(corpo.error).toBe('body/quantity must be >= 1')
     expect(response.statusCode).toBe(400)
   });
 

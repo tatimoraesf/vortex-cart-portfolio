@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 
 export class CartService {
-  constructor(private pool: Pool) { }
+  constructor(private pool: Pool, private log: any) { }
 
   async addToCart(productId: string, quantity: number) {
     const client = await this.pool.connect();
@@ -35,8 +35,8 @@ export class CartService {
       if (error.message === 'INSUFFICIENT_STOCK' || error.message === 'PRODUCT_NOT_FOUND') {
         throw error;
       }
+      this.log.error({ err: error }, 'Erro interno no CartService')
 
-      console.error("Erro interno no Postgress:", error.message);
       throw new Error('INTERNAL_ERROR');
     } finally {
       client.release();

@@ -1,6 +1,13 @@
 import { CartService } from '../src/services/CartService';
 
 describe('CartService - falhas de banco', () => {
+  const fakeLogger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn()
+  }
+
   it('deve fazer ROLLBACK quando o INSERT no carrinho falhar', async () => {
     const queriesExecutadas: string[] = [];
     const fakeClient = {
@@ -23,7 +30,7 @@ describe('CartService - falhas de banco', () => {
       connect: jest.fn(async () => fakeClient),
     };
 
-    const service = new CartService(fakePool as any);
+    const service = new CartService(fakePool as any, fakeLogger as any);
 
     await expect(service.addToCart('1', 1)).rejects.toThrow('INTERNAL_ERROR');
 
@@ -48,7 +55,7 @@ describe('CartService - falhas de banco', () => {
     const fakePool = {
       connect: jest.fn(async () => fakeClient)
     };
-    const service = new CartService(fakePool as any);
+    const service = new CartService(fakePool as any, fakeLogger as any);
 
     await expect(service.removeFromCart(1)).rejects.toThrow('falha simulada no DELETE');
 

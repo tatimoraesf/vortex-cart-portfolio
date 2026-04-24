@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import Fastify from 'fastify';
+import Fastify, { FastifyError } from 'fastify';
 import S from 'fluent-json-schema';
 import { ProductService } from './services/ProductService';
 import { CartService } from './services/CartService';
@@ -9,17 +9,40 @@ import { adminRoutes } from './routes/adminRoutes';
 import { setupDatabase, pool } from './database';
 
 export async function buildServer() {
-  const server = Fastify({ logger: true });
+  const server = Fastify({
+    logger: {
+      level: process.env.LOG_LEVEL || 'info',
+      transport: process.env.NODE_ENV !== 'production'
+        ? { target: 'pino-pretty', options: { colorize: true } }
+        : undefined
+    }
+  });
 
   await setupDatabase();
 
   const productService = new ProductService(pool as any);
-  const cartService = new CartService(pool);
+  const cartService = new CartService(pool, server.log);
 
   server.addHook('onClose', async () => {
     await pool.end();
     console.log('🐘 Conexões com o PostgreSQL encerradas.');
-  })
+  });
+
+  server.setErrorHandler((error: FastifyError, request, reply) => {
+    server.log.error({
+      err: error,
+      method: request.method,
+      url: request.url,
+      requestId: request.id,
+    }, 'Erro não tratado');
+
+    const statusCode = error.statusCode || 500;
+
+    reply.status(statusCode).send({
+      error: statusCode >= 500 ? 'Erro interno do servidor' : error.message,
+      requestId: request.id
+    });
+  });
 
   server.get('/health', async () => {
     return {
