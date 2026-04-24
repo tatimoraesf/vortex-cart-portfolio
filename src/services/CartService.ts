@@ -5,15 +5,12 @@ export class CartService {
 
   async addToCart(productId: string, quantity: number) {
     const client = await this.pool.connect();
-
     try {
       await client.query('BEGIN');
-
       const productRes = await client.query('SELECT * FROM products WHERE id = $1', [productId]);
       const product = productRes.rows[0];
 
       if (!product) throw new Error('PRODUCT_NOT_FOUND');
-
       const updateRes = await client.query(
         'UPDATE products SET inventory = inventory - $1 WHERE id = $2 AND inventory >= $1',
         [quantity, productId]
@@ -39,7 +36,7 @@ export class CartService {
         throw error;
       }
 
-      console.error("Erro intenro no Postgress:", error.message);
+      console.error("Erro interno no Postgress:", error.message);
       throw new Error('INTERNAL_ERROR');
     } finally {
       client.release();
