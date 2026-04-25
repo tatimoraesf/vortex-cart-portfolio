@@ -29,6 +29,8 @@
     "typescript": "^6.0.2"
   },
   "dependencies": {
+    "@fastify/swagger": "^9.7.0",
+    "@fastify/swagger-ui": "^5.2.6",
     "dotenv": "^17.4.1",
     "fastify": "^5.8.4",
     "fluent-json-schema": "^6.0.0",

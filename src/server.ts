@@ -7,6 +7,8 @@ import { cartRoutes } from './routes/cartRoutes';
 import { productRoutes } from './routes/productRoutes';
 import { adminRoutes } from './routes/adminRoutes';
 import { setupDatabase, pool } from './database';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
 
 export async function buildServer() {
   const server = Fastify({
@@ -19,6 +21,21 @@ export async function buildServer() {
   });
 
   await setupDatabase();
+
+  //Swagger Documentation
+  await server.register(fastifySwagger, {
+    openapi: {
+      info: {
+        title: 'Vortex Cart API',
+        description: 'API de carrinho de compas com controle de estoque',
+        version: '1.0.0'
+      }
+    }
+  });
+
+  await server.register(fastifySwaggerUi, {
+    routePrefix: '/docs'
+  })
 
   const productService = new ProductService(pool as any);
   const cartService = new CartService(pool, server.log);
@@ -62,7 +79,18 @@ export async function buildServer() {
     };
   });
 
-  server.get('/health', async () => {
+  server.get('/health', {
+    schema: {
+      description: 'Verifica se a APi está rodando',
+      tags: ['Sistema'],
+      response: {
+        200: S.object()
+          .prop('status', S.string())
+          .prop('timestamp', S.string())
+          .prop('service', S.string())
+      }
+    }
+  }, async () => {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),

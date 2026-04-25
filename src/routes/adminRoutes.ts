@@ -1,8 +1,18 @@
 import { FastifyInstance } from "fastify";
 import { pool } from "../database";
+import S from "fluent-json-schema";
 
 export async function adminRoutes(server: FastifyInstance) {
-  server.post('/admin/reset-db', async (request, reply) => {
+  server.post('/admin/reset-db', {
+    schema: {
+      description: 'Reseta o banco de dados com dados iniciais (requer autenticação',
+      tags: ['Admin'],
+      response: {
+        200: S.object().prop('message', S.string()),
+        401: S.object().prop('error', S.string())
+      }
+    }
+  }, async (request, reply) => {
 
     const token = request.headers['authorization']?.replace('Bearer ', '');
     if (!token || token !== process.env.ADMIN_API_KEY) {
