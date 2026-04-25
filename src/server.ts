@@ -42,6 +42,24 @@ export async function buildServer() {
       error: statusCode >= 500 ? 'Erro interno do servidor' : error.message,
       requestId: request.id
     });
+    if (statusCode >= 500 && process.env.N8N_WEBHOOK_URL) {
+      fetch(process.env.N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'vortex-cart',
+          level: 'error',
+          environment: process.env.NODE_ENV || 'development',
+          method: request.method,
+          url: request.url,
+          requestId: request.id,
+          error: error.message,
+          stack: error.stack,
+          timestamp: new Date().toISOString(),
+          github: 'https://github.com/tatimoraesf/vortex-cart-portfolio',
+        })
+      }).catch(() => { })
+    };
   });
 
   server.get('/health', async () => {
