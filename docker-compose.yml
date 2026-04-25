@@ -22,6 +22,10 @@ services:
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
     depends_on:
       - db
+    volumes: 
+      - .:/app
+      - /app/node_modules
+    command: npm run dev:watch
     networks:
       - vortex-net
 
