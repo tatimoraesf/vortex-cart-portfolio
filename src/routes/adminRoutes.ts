@@ -5,7 +5,7 @@ import S from "fluent-json-schema";
 export async function adminRoutes(server: FastifyInstance) {
   server.post('/admin/reset-db', {
     schema: {
-      description: 'Reseta o banco de dados com dados iniciais (requer autenticação',
+      description: 'Reseta o banco de dados com dados iniciais (requer autenticação)',
       tags: ['Admin'],
       response: {
         200: S.object().prop('message', S.string()),
