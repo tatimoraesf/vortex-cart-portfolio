@@ -9,6 +9,7 @@ import { adminRoutes } from './routes/adminRoutes';
 import { setupDatabase, pool } from './database';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
+import fastifyCors from '@fastify/cors';
 
 export async function buildServer() {
   const server = Fastify({
@@ -18,6 +19,10 @@ export async function buildServer() {
         ? { target: 'pino-pretty', options: { colorize: true } }
         : undefined
     }
+  });
+
+  await server.register(fastifyCors, {
+    origin: true
   });
 
   await setupDatabase();
