@@ -40,6 +40,7 @@ export async function cartRoutes(server: FastifyInstance, options: any) {
           S.object()
             .prop('id', S.integer())
             .prop('product_id', S.string())
+            .prop('name', S.string())
             .prop('quantity', S.number())
             .prop('price', S.number())
         )

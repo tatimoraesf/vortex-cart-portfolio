@@ -1,21 +1,26 @@
 async function init() {
   const response = await fetch('http://localhost:3000/products');
   const data = await response.json();
-  console.log(data);
-  const section = document.getElementById('products-grid')
+  const grid = document.getElementById('products-grid')
 
   data.forEach(product => {
-    section.innerHTML += `
-    <div class="product-card">
-    <p>${product.name}</p>
-    <p>${product.price}</p>
-    <p>${product.inventory}</p>
-    <button onClick="addToCart('${product.id}')"
-    ${product.inventory === 0 ? 'disabled' : ''}
-    >
-    Adicionar ao carrinho
-    </button>
-    </div> 
+    const inStock = product.inventory > 0;
+    grid.innerHTML += `
+     <div class="product-card">
+        <div class="product-image"></div>
+        <div class="product-info">
+          <p class="product-name">${product.name}</p>
+          <div class="product-meta">
+            <span class="product-price">R$ ${Number(product.price).toFixed(2).replace('.', ',')}</span>
+            <span class="stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}">
+              ${inStock ? product.inventory + ' un.' : 'Esgotado'}
+            </span>
+          </div>
+          <button class="btn-add" onclick="addToCart('${product.id}')" ${!inStock ? 'disabled' : ''}>
+            + Adicionar
+          </button>
+        </div>
+      </div>
     `
   })
   await renderCart();
@@ -44,16 +49,23 @@ async function renderCart() {
 
   const cartItems = document.getElementById('cart-items');
   cartItems.innerHTML = '';
+  let total = 0;
 
   data.forEach(item => {
+    total += Number(item.price) * item.quantity;
     cartItems.innerHTML += `
-    <div class="cart-items">
-    <p> ${item.product_id}</p>
-    <p>Quantidade: ${item.quantity}</p>
-    <button onClick="removeFromCart('${item.id}')">Remover</button>
+    <div class="cart-item">
+    <div class="cart-item-info">
+      <p class="cart-item-name">${item.name}</p>
+      <p class="cart-item-meta">R$ ${Number(item.price).toFixed(2).replace('.', ',')} · ${item.quantity} un.</p>
     </div>
+    <button class="btn-remove" onclick="removeFromCart('${item.id}')">✕</button>
+  </div>
     `
   });
+  document.getElementById('cart-total').textContent =
+    'R$ ' + total.toFixed(2).replace('.', ',');
+  document.getElementById('cart-count').textContent = data.length;
 };
 
 async function removeFromCart(cartId) {
