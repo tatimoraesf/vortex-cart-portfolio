@@ -10,10 +10,29 @@ async function init() {
     <p>${product.name}</p>
     <p>${product.price}</p>
     <p>${product.inventory}</p>
-<button ${product.inventory === 0 ? 'disabled' : ''}>Adicionar ao carrinho</button>
+    <button onClick="addToCart('${product.id}')"
+    ${product.inventory === 0 ? 'disabled' : ''}
+    >
+    Adicionar ao carrinho
+    </button>
     </div> 
     `
   })
 };
+async function addToCart(productId) {
+  const response = await fetch('http://localhost:3000/cart', {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ product_id: productId, quantity: 1 })
+  })
+  const data = await response.json()
+  console.log(data)
+
+  const toast = document.getElementById('toast')
+  toast.textContent = data.message
+  setTimeout(() => { toast.textContent = '' }, 3000)
+}
 
 init();
