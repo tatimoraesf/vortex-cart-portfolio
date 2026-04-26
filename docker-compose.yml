@@ -20,6 +20,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - NODE_ENV=${NODE_ENV}
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
+      - ADMIN_API_KEY=${ADMIN_API_KEY}
     depends_on:
       - db
     volumes: 
