@@ -10,6 +10,8 @@ import { setupDatabase, pool } from './database';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyCors from '@fastify/cors';
+import fastifyStatic from '@fastify/static';
+import path from 'path';
 
 export async function buildServer() {
   const server = Fastify({
@@ -24,6 +26,11 @@ export async function buildServer() {
   await server.register(fastifyCors, {
     origin: true,
     methods: ['GET', 'POST', 'DELETE'],
+  });
+
+  await server.register(fastifyStatic, {
+    root: path.join(__dirname, '..'),
+    prefix: '/',
   });
 
   await setupDatabase();
