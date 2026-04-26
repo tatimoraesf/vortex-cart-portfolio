@@ -18,7 +18,9 @@ async function init() {
     </div> 
     `
   })
+  await renderCart();
 };
+
 async function addToCart(productId) {
   const response = await fetch('http://localhost:3000/cart', {
     method: "POST",
@@ -33,6 +35,33 @@ async function addToCart(productId) {
   const toast = document.getElementById('toast')
   toast.textContent = data.message
   setTimeout(() => { toast.textContent = '' }, 3000)
+  await renderCart();
+};
+
+async function renderCart() {
+  const response = await fetch('http://localhost:3000/cart');
+  const data = await response.json();
+
+  const cartItems = document.getElementById('cart-items');
+  cartItems.innerHTML = '';
+
+  data.forEach(item => {
+    cartItems.innerHTML += `
+    <div class="cart-items">
+    <p> ${item.product_id}</p>
+    <p>Quantidade: ${item.quantity}</p>
+    <button onClick="removeFromCart('${item.id}')">Remover</button>
+    </div>
+    `
+  });
+};
+
+async function removeFromCart(cartId) {
+  await fetch(`http://localhost:3000/cart/${cartId}`, {
+    method: "DELETE"
+  });
+
+  renderCart();
 }
 
 init();

@@ -22,7 +22,8 @@ export async function buildServer() {
   });
 
   await server.register(fastifyCors, {
-    origin: true
+    origin: true,
+    methods: ['GET', 'POST', 'DELETE'],
   });
 
   await setupDatabase();
