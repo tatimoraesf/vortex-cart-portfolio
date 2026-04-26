@@ -5,7 +5,14 @@ async function init() {
   const section = document.getElementById('products-grid')
 
   data.forEach(product => {
-    section.innerHTML += `<div>${product.name}</div>`
+    section.innerHTML += `
+    <div class="product-card">
+    <p>${product.name}</p>
+    <p>${product.price}</p>
+    <p>${product.inventory}</p>
+<button ${product.inventory === 0 ? 'disabled' : ''}>Adicionar ao carrinho</button>
+    </div> 
+    `
   })
 };
 
