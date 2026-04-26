@@ -65,3 +65,44 @@ jobs:
             \"runId\": \"${{ github.run_id }}\",
             \"metrics\": $METRICS_CONTENT
           }"
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: user_vortex
+          POSTGRES_PASSWORD: password_vortex
+          POSTGRES_DB: vortex_cart
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Build project
+        run: npm run build
+      - name: Start server
+        run: node dist/server.js &
+        env:
+          DATABASE_URL: postgres://user_vortex:password_vortex@localhost:5432/vortex_cart
+          NODE_ENV: production
+          PORT: 3000
+          HOST: 0.0.0.0
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+      - name: Wait for server
+        run: npx wait-on http://localhost:3000/health
+      - name: Run Cypress
+        run: npx cypress run
+        env:
+          CYPRESS_ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
