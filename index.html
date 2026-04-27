@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Vortex Cart</title>
+</head>
+
+<body>
+  <nav>
+    <span>vortex<em>cart</em></span>
+    <div id="cart-badge">
+      🛒 Carrinho <span id="cart-count">0</span>
+    </div>
+  </nav>
+  <main>
+    <section id="products-section">
+      <h2>Produtos</h2>
+      <div id="products-grid"></div>
+    </section>
+    <section id="cart-section">
+      <div class="cart-header">
+        <h2>Carrinho</h2>
+      </div>
+      <div id="cart-items"></div>
+      <div class="cart-footer">
+        <span>Total</span>
+        <span id="cart-total">R$0,00</span>
+      </div>
+
+    </section>
+  </main>
+  <div id="toast"></div>
+  <script src="app.js"></script>
+
+</body>
+
+</html>

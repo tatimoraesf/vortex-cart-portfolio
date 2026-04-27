@@ -5,7 +5,7 @@ dist/
 *.sqlite
 .DS_Store
 reports/
-*.html
+reports/*.html
 metrics.json
 .env.test
 cypress.env.json
