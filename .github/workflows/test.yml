@@ -108,3 +108,4 @@ jobs:
         run: npx cypress run
         env:
           CYPRESS_ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+          
