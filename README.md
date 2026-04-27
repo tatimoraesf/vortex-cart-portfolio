@@ -1,6 +1,6 @@
 # Vortex Cart
 
-Aplicação de carrinho de compras com controle de estoque, frontend funcional e cobertura completa de testes automatizados. Projeto de portfólio com foco em QA Engineering: testes de integração, testes E2E, observabilidade e CI/CD.
+API de carrinho com interface web, 20 testes automatizados (integração + E2E), observabilidade com Pino e pipeline de CI/CD completo com notificações no Discord.
 
 ## O que o projeto faz
 
