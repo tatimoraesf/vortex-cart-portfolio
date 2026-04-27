@@ -60,6 +60,7 @@ jobs:
           -H "Content-Type: application/json" \
           -d "{
             \"status\": \"${{ job.status }}\",
+            \"job\": \"integration\",
             \"repository\": \"${{ github.repository }}\",
             \"commit\": \"${{ github.sha }}\",
             \"runId\": \"${{ github.run_id }}\",
@@ -108,4 +109,15 @@ jobs:
         run: npx cypress run
         env:
           CYPRESS_ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
-          
+      - name: Notify n8n E2E (Webhook)
+        if: always()
+        run: |
+          curl -X POST "${{ secrets.N8N_WEBHOOK_URL }}" \
+          -H "Content-Type: application/json" \
+          -d "{
+            \"status\": \"${{ job.status }}\",
+            \"job\": \"e2e\",
+            \"repository\": \"${{ github.repository }}\",
+            \"commit\": \"${{ github.sha }}\",
+            \"runId\": \"${{ github.run_id }}\"
+          }"
