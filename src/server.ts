@@ -114,13 +114,30 @@ export async function buildServer() {
           .prop('status', S.string())
           .prop('timestamp', S.string())
           .prop('service', S.string())
+          .prop('database', S.string()),
+        503: S.object()
+          .prop('status', S.string())
+          .prop('timestamp', S.string())
+          .prop('service', S.string())
+          .prop('database', S.string())
       }
     }
-  }, async () => {
-    return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      service: "vortex-cart"
+  }, async (request, reply) => {
+    try {
+      await pool.query('SELECT 1');
+      return {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        service: 'vortex-cart',
+        database: 'ok'
+      }
+    } catch (error) {
+      return reply.status(503).send({
+        status: 'degraded',
+        timestamp: new Date().toISOString(),
+        service: 'vortex-cart',
+        database: 'unavailable'
+      });
     };
   });
 
