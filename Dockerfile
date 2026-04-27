@@ -15,8 +15,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Instala as dependências e FORÇA a compilação do sqlite3 no ambiente atual
-RUN npm install && npm rebuild sqlite3 --build-from-source
+# Instala as dependências
+RUN npm install
 
 # Copia o restante do código
 COPY . .
