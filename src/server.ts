@@ -92,6 +92,19 @@ export async function buildServer() {
     };
   });
 
+  server.setNotFoundHandler((request, reply) => {
+    server.log.warn({
+      method: request.method,
+      url: request.url,
+      requestId: request.id
+    }, 'Rota não encontrada')
+    reply.status(404).send({
+      error: 'Rota não encontrada',
+      requestId: request.id
+    });
+  });
+
+
   server.get('/health', {
     schema: {
       description: 'Verifica se a APi está rodando',
