@@ -9,3 +9,4 @@ reports/*.html
 metrics.json
 .env.test
 cypress.env.json
+cypress/reports/

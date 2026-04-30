@@ -21,6 +21,7 @@
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",
     "cypress": "^15.14.1",
+    "cypress-mochawesome-reporter": "^3.8.4",
     "dotenv-cli": "^11.0.0",
     "jest": "^30.3.0",
     "jest-html-reporter": "^4.4.0",
