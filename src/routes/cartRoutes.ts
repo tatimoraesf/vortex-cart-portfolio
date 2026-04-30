@@ -76,7 +76,7 @@ export async function cartRoutes(server: FastifyInstance, options: any) {
       await cartService.removeFromCart(idParaRemover);
       return reply.status(204).send();
     } catch (error: any) {
-      return reply.status(404).send({ error: 'Item nao encontrado no carrinho' });
+      return reply.status(404).send({ error: 'Item não encontrado no carrinho' });
     }
   });
 };

@@ -44,7 +44,8 @@ describe('Validar endpoint /cart', () => {
       payload: { product_id: "1", quantity: 10 }
     })
     expect(response.statusCode).toBe(422)
-  })
+  });
+
   test('Deve retornar 400 ao tentar adicionar um valor zerado', async () => {
     const response = await ctx.app.inject({
       method: 'POST',

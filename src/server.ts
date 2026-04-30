@@ -104,10 +104,9 @@ export async function buildServer() {
     });
   });
 
-
   server.get('/health', {
     schema: {
-      description: 'Verifica se a APi está rodando',
+      description: 'Verifica se a API está rodando',
       tags: ['Sistema'],
       response: {
         200: S.object()
