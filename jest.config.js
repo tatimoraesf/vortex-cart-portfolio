@@ -14,5 +14,13 @@ module.exports = {
         darkTheme: true
       }
     ]
-  ]
+  ],
+  collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts'
+  ],
+
+  coverageDirectory: 'reports/coverage',
+  coverageReporters: ['text', 'html'],
 };
