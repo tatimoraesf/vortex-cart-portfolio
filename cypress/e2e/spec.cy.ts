@@ -28,8 +28,8 @@ describe('Vortex Cart', () => {
 
   it('deve desabilitar o botão quando o produto está esgotado', () => {
     Cypress._.times(5, () => {
-      cy.get(".btn-add").eq(1).click();
+      cy.get(".btn-add").eq(0).click();
     });
-    cy.get('.btn-add').eq(1).should('be.disabled');
+    cy.get('.btn-add').eq(0).should('be.disabled');
   });
 });
