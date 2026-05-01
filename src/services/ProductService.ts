@@ -1,10 +1,10 @@
 import { Pool } from 'pg';
 
 export class ProductService {
-  constructor(private pool: Pool) {}
+  constructor(private pool: Pool) { }
 
   async listAll() {
-    const res = await this.pool.query('SELECT * FROM products');
+    const res = await this.pool.query('SELECT * FROM products ORDER BY name');
     return res.rows;
   }
 
