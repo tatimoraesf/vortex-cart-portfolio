@@ -163,6 +163,4 @@ if (require.main === module) {
     }
   }
   start();
-  const testeHusky = 'bloquear';
-  ISSO_NAO_E_TYPESCRIPT
 }
