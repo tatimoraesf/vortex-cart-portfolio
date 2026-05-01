@@ -1,5 +1,5 @@
 async function renderProducts() {
-  const response = await fetch('http://localhost:3000/products');
+  const response = await fetch('/products');
   const data = await response.json();
   const grid = document.getElementById('products-grid')
   grid.innerHTML = '';
@@ -32,7 +32,7 @@ async function init() {
 };
 
 async function addToCart(productId) {
-  const response = await fetch('http://localhost:3000/cart', {
+  const response = await fetch('/cart', {
     method: "POST",
     headers: {
       'Content-Type': 'application/json'
@@ -51,7 +51,7 @@ async function addToCart(productId) {
 };
 
 async function renderCart() {
-  const response = await fetch('http://localhost:3000/cart');
+  const response = await fetch('/cart');
   const data = await response.json();
 
   const cartItems = document.getElementById('cart-items');
@@ -76,7 +76,7 @@ async function renderCart() {
 };
 
 async function removeFromCart(cartId) {
-  await fetch(`http://localhost:3000/cart/${cartId}`, {
+  await fetch(`/cart/${cartId}`, {
     method: "DELETE"
   });
 
