@@ -1,8 +1,7 @@
-import { Pool } from "pg";
+import { Pool } from 'pg';
 
 export class ProductService {
-  constructor(private pool: Pool) { }
-
+  constructor(private pool: Pool) {}
 
   async listAll() {
     const res = await this.pool.query('SELECT * FROM products');
@@ -10,11 +9,11 @@ export class ProductService {
   }
 
   async findById(id: string) {
-    const res = await this.pool.query('SELECT * FROM products WHERE id = $1', [id])
+    const res = await this.pool.query('SELECT * FROM products WHERE id = $1', [id]);
     const product = res.rows[0];
 
     if (!product) {
-      return null
+      return null;
     }
 
     return product;
