@@ -26,7 +26,7 @@ services:
     volumes: 
       - .:/app
       - /app/node_modules
-    command: npm run dev:watch
+    command: node_modules/.bin/tsx watch src/server.ts
     networks:
       - vortex-net
 

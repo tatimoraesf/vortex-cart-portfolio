@@ -145,7 +145,7 @@ export async function buildServer() {
   server.register(productRoutes, { productService });
 
   return server;
-}
+};
 
 if (require.main === module) {
   const start = async () => {
@@ -157,10 +157,20 @@ if (require.main === module) {
 
       await app.listen({ port, host });
 
+      const shutdown = async (signal: string) => {
+        app.log.info(`Sinal ${signal} recebido - encerrando servidor...`);
+        await app.close();
+        app.log.info('Servidor encerrado com sucesso!');
+        process.exit(0);
+      };
+
+      process.on('SIGTERM', () => shutdown('SIGTERM'));
+      process.on('SIGINT', () => shutdown('SIGINT'));
+
     } catch (err) {
       console.error('❌ Erro ao subir o servidor:', err)
       process.exit(1);
-    }
-  }
+    };
+  };
   start();
-}
+};
