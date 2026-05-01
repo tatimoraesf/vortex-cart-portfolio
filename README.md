@@ -1,6 +1,6 @@
 # Vortex Cart
 
-API de carrinho com interface web, 20 testes automatizados (integração + E2E), observabilidade com Pino e pipeline de CI/CD completo com notificações no Discord.
+API de carrinho com interface web, 24 testes automatizados (integração + E2E), observabilidade com Pino, Graceful Shutdown e pipeline de CI/CD completo com notificações no Discord.
 
 ## O que o projeto faz
 
@@ -24,6 +24,16 @@ O sistema gerencia produtos e um carrinho de compras com as seguintes regras de 
 - **Infraestrutura:** Docker Compose (API + PostgreSQL + n8n + ngrok)
 - **CI/CD:** GitHub Actions com dois jobs paralelos (integração + E2E) e notificação no Discord via n8n
 
+## Deploy
+
+A aplicação está em produção no Railway com banco PostgreSQL dedicado.
+
+🔗 **https://vortex-cart-portfolio-production.up.railway.app**
+
+- Frontend: `/`
+- Documentação da API: `/docs`
+- Health check: `/health`
+
 ## Testes de integração
 
 16 testes organizados por domínio, rodando em banco isolado (`vortex_cart_test`):
@@ -36,12 +46,19 @@ O sistema gerencia produtos e um carrinho de compras com as seguintes regras de 
 
 ## Testes E2E
 
-4 testes Cypress cobrindo os fluxos principais do frontend:
+8 testes Cypress cobrindo os fluxos principais do frontend:
 
+Happy path:
 - Exibição da lista de produtos
 - Adicionar produto ao carrinho
 - Remover produto do carrinho
 - Botão desabilitado quando estoque está zerado
+
+Unhappy path:
+- Requisição com quantity inválida retorna 400
+- Produto inexistente retorna 404
+- Item de carrinho inexistente retorna 404
+- Estoque insuficiente retorna 422
 
 Os testes resetam o banco via `POST /admin/reset-db` no `beforeEach` — garantindo isolamento entre os testes.
 
@@ -50,6 +67,7 @@ Os testes resetam o banco via `POST /admin/reset-db` no `beforeEach` — garanti
 - **Logger estruturado:** Pino com `pino-pretty` em desenvolvimento e JSON em produção.
 - **Error handler global:** erros inesperados são logados com método, URL, requestId e stack trace. O cliente recebe mensagem genérica + requestId para rastreamento.
 - **Alertas automáticos:** erros 500 disparam alerta no Discord via n8n com requestId, rota, stack trace e link do repositório.
+- **Graceful Shutdown:** a aplicação escuta `SIGTERM` e `SIGINT` — ao encerrar, fecha o servidor Fastify e as conexões com o banco de forma limpa antes de terminar o processo.
 
 ## Documentação da API
 
@@ -86,7 +104,7 @@ src/
 │   ├── CartService.ts      # Transações SQL, controle de estoque
 │   └── ProductService.ts   # Consultas de produtos
 ├── database.ts             # Pool PostgreSQL + criação de tabelas
-└── server.ts               # Factory do servidor, logger Pino, error handler global
+└── server.ts               # Factory do servidor, logger Pino, error handler global, graceful shutdown
 
 tests/
 ├── helpers/db.ts           # Setup compartilhado entre specs
