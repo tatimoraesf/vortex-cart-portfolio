@@ -20,6 +20,7 @@ O sistema gerencia produtos e um carrinho de compras com as seguintes regras de 
 - **Banco de dados:** PostgreSQL 15
 - **Testes de integração:** Jest + Supertest
 - **Testes E2E:** Cypress 15
+- **Testes de carga:** k6
 - **Documentação:** Swagger/OpenAPI via `@fastify/swagger`
 - **Infraestrutura:** Docker Compose (API + PostgreSQL + n8n + ngrok)
 - **CI/CD:** GitHub Actions com dois jobs paralelos (integração + E2E) e notificação no Discord via n8n
@@ -61,6 +62,13 @@ Unhappy path:
 - Estoque insuficiente retorna 422
 
 Os testes resetam o banco via `POST /admin/reset-db` no `beforeEach` — garantindo isolamento entre os testes.
+
+## Testes de Carga e Concorrência
+
+2 scripts k6 cobrindo performance e comportamento sob pressão:
+
+- `k6/load-test.js` — 10 usuários simultâneos por 30s com thresholds definidos
+- `k6/concurrency-test.js` — prova que o estoque não vende acima do limite sob requisições paralelas
 
 ## Observabilidade
 
