@@ -1,6 +1,6 @@
 # Vortex Cart
 
-API de carrinho com interface web, 24 testes automatizados (integração + E2E), observabilidade com Pino, Graceful Shutdown e pipeline de CI/CD completo com notificações no Discord.
+API de carrinho com interface web, 26 testes automatizados (integração + E2E), observabilidade com Pino, Graceful Shutdown e pipeline de CI/CD completo com notificações no Discord.
 
 ## O que o projeto faz
 
@@ -37,7 +37,7 @@ A aplicação está em produção no Railway com banco PostgreSQL dedicado.
 
 ## Testes de integração
 
-16 testes organizados por domínio, rodando em banco isolado (`vortex_cart_test`):
+18 testes organizados por domínio, rodando em banco isolado (`vortex_cart_test`):
 
 - `health.spec.ts` — verificação de saúde da API
 - `products.spec.ts` — listagem e busca de produtos
@@ -151,7 +151,8 @@ k6/
 ├── load-test.js            # Teste de carga: 10 usuários, 30s, thresholds definidos
 └── concurrency-test.js     # Teste de concorrência: prova que o estoque não vende acima do limite
 
-index.html                  # Frontend
-app.js                      # Lógica do frontend
-style.css                   # Estilos
+public/
+├── index.html              # Frontend
+├── app.js                  # Lógica do frontend
+└── style.css               # Estilos
 ```
