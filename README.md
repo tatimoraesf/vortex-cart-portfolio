@@ -18,7 +18,7 @@ O sistema gerencia produtos e um carrinho de compras com as seguintes regras de 
 - **Linguagem:** TypeScript
 - **Framework:** Fastify 5
 - **Banco de dados:** PostgreSQL 15
-- **Testes de integração:** Jest + Supertest
+- **Testes de integração:** Jest + app.inject (Fastify)
 - **Testes E2E:** Cypress 15
 - **Testes de carga:** k6
 - **Documentação:** Swagger/OpenAPI via `@fastify/swagger`

@@ -1,4 +1,3 @@
-import supertest from 'supertest';
 import { buildServer } from '../src/server';
 import { describe, expect, test, beforeAll, beforeEach, afterAll } from '@jest/globals';
 import { pool } from '../src/database';
@@ -8,20 +7,28 @@ describe('Validar endpoint /cart', () => {
   const ctx = setupDb();
 
   test('Deve retornar 404 ao tentar adicionar um produto inexistente', async () => {
-    const response = await supertest(ctx.app.server)
-      .post('/cart')
-      .send({ product_id: "999", quantity: 1 });
-    expect(response.status).toBe(404);
+    const response = await ctx.app.inject({
+      method: 'POST',
+      url: '/cart',
+      payload: { product_id: "999", quantity: 1 }
+    })
+    expect(response.statusCode).toBe(404)
   });
 
   test('Deve listar no GET o produto adicionado via POST', async () => {
-    await supertest(ctx.app.server)
-      .post('/cart')
-      .send({ product_id: "1", quantity: 1 });
+    const response = await ctx.app.inject({
+      method: 'POST',
+      url: '/cart',
+      payload: { product_id: "1", quantity: 1 }
+    })
+    const cart = await ctx.app.inject({
+      method: 'GET',
+      url: '/cart',
+    })
 
-    const response = await supertest(ctx.app.server).get('/cart');
-    expect(response.status).toBe(200);
-    expect(response.body.length).toBe(1);
+    const items = JSON.parse(cart.payload);
+    expect(response.statusCode).toBe(200);
+    expect(items.length).toBe(1);
   });
 
   test('RACE CONDITION: Não deve permitir vender mais do que o estoque em pedidos simultâneos', async () => {
