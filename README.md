@@ -2,7 +2,24 @@
 
 ![CI](https://github.com/tatimoraesf/vortex-cart-portfolio/actions/workflows/test.yml/badge.svg)
 
+Projeto pessoal construído para aprofundar habilidades de QA Engineering — da escrita de testes até observabilidade, automação de CI/CD e deploy em produção.
+
 API de carrinho com interface web, 26 testes automatizados (integração + E2E), observabilidade com Pino, Graceful Shutdown e pipeline de CI/CD completo com notificações no Discord.
+Os testes cobrem quatro camadas: integração com banco real, falhas simuladas com mocks, E2E no frontend com Cypress e carga/concorrência com k6.
+
+## Screenshots
+
+### Frontend
+
+![Frontend](docs/frontend.png)
+
+### Documentação da API
+
+![Swagger](docs/swagger.png)
+
+### Relatório de Testes
+
+![Cypress Report](docs/cypress-report.png)
 
 ## O que o projeto faz
 
