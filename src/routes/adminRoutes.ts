@@ -20,19 +20,27 @@ export async function adminRoutes(server: FastifyInstance) {
       if (!token || token !== process.env.ADMIN_API_KEY) {
         return reply.status(401).send({ error: 'Não autorizado' });
       }
-
-      await pool.query('DELETE FROM cart');
-      await pool.query('DELETE FROM products');
-
-      await pool.query(
-        'INSERT INTO products (id, name, price, inventory) VALUES ($1, $2, $3, $4)',
-        ['1', 'Teclado Mecânico', 150.0, 10],
-      );
-      await pool.query(
-        'INSERT INTO products (id, name, price, inventory) VALUES ($1, $2, $3, $4)',
-        ['2', 'Mouse Gamer', 80.0, 5],
-      );
-
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN')
+        await client.query('DELETE FROM cart');
+        await client.query('DELETE FROM products');
+  
+        await client.query(
+          'INSERT INTO products (id, name, price, inventory) VALUES ($1, $2, $3, $4)',
+          ['1', 'Teclado Mecânico', 150.0, 10],
+        );
+        await client.query(
+          'INSERT INTO products (id, name, price, inventory) VALUES ($1, $2, $3, $4)',
+          ['2', 'Mouse Gamer', 80.0, 5],
+        );
+        await client.query('COMMIT');
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
       return { message: 'Banco de dados resetado com sucesso!' };
     },
   );
