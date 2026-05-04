@@ -71,6 +71,7 @@ export async function cartRoutes(server: FastifyInstance, options: any) {
           204: S.object().description('Item removido com sucesso'),
           400: S.object().prop('error', S.string()),
           404: S.object().prop('error', S.string()),
+          500: S.object().prop('error', S.string()),
         },
       },
     },
@@ -88,8 +89,9 @@ export async function cartRoutes(server: FastifyInstance, options: any) {
         await cartService.removeFromCart(idParaRemover);
         return reply.status(204).send();
       } catch (error: any) {
-        return reply.status(404).send({ error: 'Item não encontrado no carrinho' });
-      }
+
+        if ('ITEM_NOT_FOUND' === error.message) return reply.status(404).send({ error: 'Item não encontrado no carrinho' });
+        throw error;}
     },
   );
 }
