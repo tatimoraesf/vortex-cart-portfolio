@@ -50,12 +50,14 @@ A aplicação está em produção no Railway com banco PostgreSQL dedicado.
 8 testes Cypress cobrindo os fluxos principais do frontend:
 
 Happy path:
+
 - Exibição da lista de produtos
 - Adicionar produto ao carrinho
 - Remover produto do carrinho
 - Botão desabilitado quando estoque está zerado
 
 Unhappy path:
+
 - Requisição com quantity inválida retorna 400
 - Produto inexistente retorna 404
 - Item de carrinho inexistente retorna 404
@@ -80,6 +82,25 @@ Os testes resetam o banco via `POST /admin/reset-db` no `beforeEach` — garanti
 ## Documentação da API
 
 Documentação interativa via Swagger/OpenAPI disponível em `/docs` com o servidor rodando. Rotas organizadas por domínio: Sistema, Admin, Carrinho e Produtos.
+
+## Configuração de ambiente
+
+Crie um arquivo `.env` na raiz baseado no `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Variáveis obrigatórias:
+
+| Variável          | Descrição                                           |
+| ----------------- | --------------------------------------------------- |
+| `DATABASE_URL`    | URL de conexão com o PostgreSQL                     |
+| `ADMIN_API_KEY`   | Chave de autenticação dos endpoints administrativos |
+| `N8N_WEBHOOK_URL` | URL do webhook n8n para alertas no Discord          |
+| `NGROK_AUTHTOKEN` | Token do ngrok para expor o n8n publicamente        |
+
+Para testes, crie também um `.env.test` apontando para o banco `vortex_cart_test`.
 
 ## Como rodar
 
@@ -125,6 +146,10 @@ tests/
 cypress/
 └── e2e/
     └── spec.cy.ts          # Testes E2E do frontend
+
+k6/
+├── load-test.js            # Teste de carga: 10 usuários, 30s, thresholds definidos
+└── concurrency-test.js     # Teste de concorrência: prova que o estoque não vende acima do limite
 
 index.html                  # Frontend
 app.js                      # Lógica do frontend
