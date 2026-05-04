@@ -11,3 +11,4 @@ metrics.json
 cypress.env.json
 cypress/reports/
 reports/coverage/
+database.db

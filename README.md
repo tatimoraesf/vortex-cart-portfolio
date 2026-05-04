@@ -1,5 +1,7 @@
 # Vortex Cart
 
+![CI](https://github.com/tatimoraesf/vortex-cart-portfolio/actions/workflows/test.yml/badge.svg)
+
 API de carrinho com interface web, 26 testes automatizados (integração + E2E), observabilidade com Pino, Graceful Shutdown e pipeline de CI/CD completo com notificações no Discord.
 
 ## O que o projeto faz
