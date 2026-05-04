@@ -80,11 +80,10 @@ export async function cartRoutes(server: FastifyInstance, options: any) {
       const idParam = params.id;
 
       try {
-        const idParaRemover = parseInt(idParam, 10);
-
-        if (isNaN(idParaRemover)) {
+        if (!/^\d+$/.test(idParam)) {
           return reply.status(400).send({ error: 'ID inválido' });
         }
+        const idParaRemover = parseInt(idParam, 10);
 
         await cartService.removeFromCart(idParaRemover);
         return reply.status(204).send();

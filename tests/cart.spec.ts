@@ -89,4 +89,23 @@ describe('Validar endpoint /cart', () => {
     const res2 = await pool.query("SELECT inventory FROM products WHERE id = '1'");
     expect(res2.rows[0].inventory).toBe(5);
   });
+
+  test('Deve retornar 400 ao deletar um produto com ID inválido', async () => {
+    const response = await ctx.app.inject({
+      method: 'DELETE',
+      url: '/cart/99a',
+    })
+
+    expect(response.statusCode).toBe(400)
+  });
+
+   test('Deve retornar 404 ao deletar um produto com ID inexistente', async () => {
+    const response = await ctx.app.inject({
+      method: 'DELETE',
+      url: '/cart/1111',
+    })
+
+    expect(response.statusCode).toBe(404)
+  });
+
 });
