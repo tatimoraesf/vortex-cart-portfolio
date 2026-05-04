@@ -29,7 +29,7 @@ export async function buildServer() {
   });
 
   await server.register(fastifyStatic, {
-    root: path.join(__dirname, '..'),
+    root: path.join(__dirname, '..', 'public'),
     prefix: '/',
   });
 
