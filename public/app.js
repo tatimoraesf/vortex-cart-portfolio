@@ -1,5 +1,11 @@
 async function renderProducts() {
   const response = await fetch('/products');
+
+  if (!response.ok) {
+    console.error('Erro ao carregar produtos:', response.status);
+    return;
+  }
+
   const data = await response.json();
   const grid = document.getElementById('products-grid')
   grid.innerHTML = '';
@@ -39,6 +45,12 @@ async function addToCart(productId) {
     },
     body: JSON.stringify({ product_id: productId, quantity: 1 })
   })
+
+  if (!response.ok) {
+    console.error('Erro ao adicionar ao carrinho:', response.status);
+    return;
+  }
+
   const data = await response.json()
   console.log(data)
 
@@ -52,6 +64,12 @@ async function addToCart(productId) {
 
 async function renderCart() {
   const response = await fetch('/cart');
+
+  if (!response.ok) {
+    console.error('Erro ao carregar carrinho:', response.status);
+    return;
+  }
+
   const data = await response.json();
 
   const cartItems = document.getElementById('cart-items');
