@@ -66,16 +66,16 @@ describe('Validar endpoint /cart', () => {
   });
 
   test('Deve retornar 200 ao adicionar um produto no carrinho e atualizar o estoque', async () => {
+    const resBefore = await pool.query("SELECT inventory FROM products WHERE id = '1'");
     const response = await ctx.app.inject({
       method: 'POST',
       url: '/cart',
       payload: { product_id: "1", quantity: 1 }
     });
     const res = await pool.query("SELECT inventory FROM products WHERE id = '1'");
-
     expect(response.statusCode).toBe(200)
     expect(JSON.parse(response.payload).message).toBe('Adicionado com sucesso!')
-    expect(res.rows[0].inventory).toBe(4)
+    expect(res.rows[0].inventory).toBe(resBefore.rows[0].inventory - 1);
   });
 
   test('Deve retornar o estoque atualizado após a remoção do produto', async () => {
