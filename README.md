@@ -164,7 +164,8 @@ tests/
 
 cypress/
 └── e2e/
-    └── spec.cy.ts          # Testes E2E do frontend
+    ├── spec.cy.ts          # Testes E2E do frontend — happy path
+    └── cart-errors.cy.ts   # Testes E2E — unhappy path (4xx/422)
 
 k6/
 ├── load-test.js            # Teste de carga: 10 usuários, 30s, thresholds definidos

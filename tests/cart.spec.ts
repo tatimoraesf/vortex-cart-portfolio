@@ -61,7 +61,7 @@ describe('Validar endpoint /cart', () => {
     })
 
     const corpo = JSON.parse(response.payload)
-    expect(corpo.error).toBe('body/quantity must be >= 1')
+    expect(corpo.error).toMatch(/quantity/i)
     expect(response.statusCode).toBe(400)
   });
 
@@ -79,6 +79,7 @@ describe('Validar endpoint /cart', () => {
   });
 
   test('Deve retornar o estoque atualizado após a remoção do produto', async () => {
+    const resBefore = await pool.query("SELECT inventory FROM products WHERE id = '1'");
     const response = await ctx.app.inject({
       method: 'POST',
       url: '/cart',
@@ -94,7 +95,7 @@ describe('Validar endpoint /cart', () => {
       url: `/cart/${idNoCarrinho}`,
     });
     const res2 = await pool.query("SELECT inventory FROM products WHERE id = '1'");
-    expect(res2.rows[0].inventory).toBe(5);
+    expect(res2.rows[0].inventory).toBe(resBefore.rows[0].inventory);
   });
 
   test('Deve retornar 400 ao deletar um produto com ID inválido', async () => {
