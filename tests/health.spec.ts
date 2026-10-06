@@ -8,7 +8,11 @@ describe('Valida endpoint /health', () => {
       method: 'GET',
       url: '/health'
     });
+    const body = JSON.parse(response.payload);
+    
     expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.payload).status).toBe("ok");
+    expect(body.status).toBe("ok");
+    expect(body.service).toBe("vortex-cart");
+    expect(body.database).toBe("ok");
   });
 });
