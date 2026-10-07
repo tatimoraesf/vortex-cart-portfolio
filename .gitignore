@@ -12,3 +12,6 @@ cypress.env.json
 cypress/reports/
 reports/coverage/
 database.db
+
+# Notas pessoais de estudo/mentoria QA — não fazem parte do portfólio
+MENTORIA.md
